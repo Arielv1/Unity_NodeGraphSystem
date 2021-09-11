@@ -11,6 +11,8 @@ public class GraphViewScreen : GraphView
     private float nodePosOffset = 0;
     private float nodePosInit = 100;
     private List<NodeType> NodesList = new List<NodeType>();
+
+    // Interaction with GraphView window screen editor
     public GraphViewScreen()
     {
         this.AddManipulator(new ContentDragger());
@@ -28,6 +30,8 @@ public class GraphViewScreen : GraphView
     {
         return this.NodesList;
     }
+
+    // Right mouse click actions
     public override void BuildContextualMenu(ContextualMenuPopulateEvent evt)
     {
         evt.menu.AppendAction("Add NodeType A", (action) => AddNodeToScreen(CreateNodeType(NodeType.Type.TypeA)));
@@ -35,8 +39,6 @@ public class GraphViewScreen : GraphView
         evt.menu.AppendAction("Add NodeType C", (action) => AddNodeToScreen(CreateNodeType(NodeType.Type.TypeC)));
         evt.menu.AppendAction("Add Bridge Node", (action) => AddNodeToScreen(CreateNodeType(NodeType.Type.Bridge)));
     }
-
-   
 
     private Port GeneratePort(NodeType node, Direction portDirection, Port.Capacity capacity = Port.Capacity.Single)
     {
@@ -47,20 +49,21 @@ public class GraphViewScreen : GraphView
     {
         var nodeType = new NodeType(Guid.NewGuid().ToString(), type);
         nodeType.title = type.ToString();
-        
+
+        // Input port
         var inputPort = GeneratePort(nodeType, Direction.Input);
         inputPort.portName = "Input";
         nodeType.inputContainer.Add(inputPort);
 
+        // Output port
         var outputPort = GeneratePort(nodeType, Direction.Output);
         outputPort.portName = "Output";
         nodeType.outputContainer.Add(outputPort);
 
+        // Spawn position
         nodeType.SetPosition(new Rect(nodePosInit + nodePosOffset, nodePosInit + nodePosOffset, NodeSize.x, NodeSize.y));
-
         nodePosOffset = nodePosOffset < 100 ? nodePosOffset + 10 : 0;
 
-        Debug.Log("Node" + type.ToString() + "BG");
         nodeType.styleSheets.Add(Resources.Load<StyleSheet>("Node" + type.ToString() + "BG"));
 
         nodeType.RefreshExpandedState();
@@ -84,6 +87,8 @@ public class GraphViewScreen : GraphView
         });
     }
 
+    // Nodes can connect to other nodes with the same type.
+    // Bridge nodes can be connected and connect to any other node.
     public override List<Port> GetCompatiblePorts(Port startPort, NodeAdapter nodeAdapter)
     {
         var compatiblePorts = new List<Port>();

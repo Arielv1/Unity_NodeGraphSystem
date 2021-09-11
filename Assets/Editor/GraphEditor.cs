@@ -3,10 +3,11 @@ using UnityEditor;
 using UnityEditor.UIElements;
 using UnityEngine;
 using UnityEngine.UIElements;
-
+using System;
 public class GraphEditor : EditorWindow
 {
     private GraphViewScreen graphView;
+    private Toolbar toolbar;
     private string fileName = "New Graph";
     [MenuItem("Graph/Graph Window")]
     public static void OpenGraphWindow()
@@ -26,7 +27,7 @@ public class GraphEditor : EditorWindow
     {
         rootVisualElement.Remove(graphView);
     }
-
+        
     private void BuildGraph()
     {
         graphView = new GraphViewScreen
@@ -37,19 +38,19 @@ public class GraphEditor : EditorWindow
         rootVisualElement.Add(graphView);
     }
 
+    void CreateButtonForToolbar(Toolbar toolbar, Action action, string btnName)
+    {
+        toolbar.Add(new Button((action)) { text = btnName });
+    }
+
     private void BuildToolbar()
     {
-        var toolbar = new Toolbar();
-     
-        var btnRemoveAllNodes = new Button(() =>
-        {
-            graphView.RemoveAllNodesFromGraphView();
-        });
-        btnRemoveAllNodes.text = "Clear Nodes";
-        toolbar.Add(btnRemoveAllNodes);
+        toolbar = new Toolbar();
 
-        /* Export & Import - Start */
-        var fileNameTextField = new TextField("File Name");
+        // Btn clear nodes
+        CreateButtonForToolbar(toolbar, () => graphView.RemoveAllNodesFromGraphView(), "Clear Nodes");
+
+        TextField fileNameTextField = new TextField("File Name");
         fileNameTextField.SetValueWithoutNotify(fileName);
         fileNameTextField.MarkDirtyRepaint();
         fileNameTextField.RegisterValueChangedCallback((e) =>
@@ -57,22 +58,28 @@ public class GraphEditor : EditorWindow
             fileName = e.newValue; 
         });
         toolbar.Add(fileNameTextField);
+    
+        // Btns save & load
+        CreateButtonForToolbar(toolbar, () => PerformGraphViewOnFileAction(GraphUtilities.GraphFileActionType.Save), "Save");
+        CreateButtonForToolbar(toolbar, () => { // Reloads GraphView, then loads the graph - without reloading view the edges will disconnect from nodes
+            OnDisable();
+            OnEnable(); 
+            PerformGraphViewOnFileAction(GraphUtilities.GraphFileActionType.Load); 
+            }
+            , "Load");
 
-        toolbar.Add(new Button(() => PerformGraphViewOnFileAction(GraphUtilities.GraphFileActionType.Save)) { text = "Save" });
-        toolbar.Add(new Button(() => PerformGraphViewOnFileAction(GraphUtilities.GraphFileActionType.Load)) { text = "Load" });
-        /* Export & Import - End */
-
-        rootVisualElement.Add(toolbar);
+        graphView.Add(toolbar);
     }
 
     void BuildMinimap()
     {
         MiniMap minimap = new MiniMap();
         minimap.anchored = true;
-        minimap.SetPosition(new Rect(50, 50, 200, 200));
+        minimap.SetPosition(new Rect(550, 50, 200, 200));
         graphView.Add(minimap);
     }
 
+    // Performs action based on file - for now save & load file, if more actions are added in future need to add their 'case' in switch statement.
     void PerformGraphViewOnFileAction(GraphUtilities.GraphFileActionType actionType)
     {
         if (fileName == null || fileName.Length == 0)
@@ -81,7 +88,7 @@ public class GraphEditor : EditorWindow
             return;
         }
 
-        var graphUtils = GraphUtilities.GetInstance(graphView);
+        GraphUtilities graphUtils = GraphUtilities.GetInstance(graphView);
 
         switch (actionType)
         {

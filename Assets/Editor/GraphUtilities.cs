@@ -67,7 +67,6 @@ public class GraphUtilities
             EditorUtility.DisplayDialog("Invalid File", "Could not find file with the given name.", "Close");
             return;
         }
-
         ClearPresentGraph();
         CreateNodes();
         CreateEdges();
