@@ -79,7 +79,7 @@ public class GraphEditor : EditorWindow
             return;
         }
 
-        GraphUtilities graphUtils = GraphUtilities.GetInstance(graphView);
+        GraphUtilities graphUtils = new GraphUtilities(graphView);
 
         switch (actionType)
         {

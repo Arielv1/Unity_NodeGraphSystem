@@ -16,7 +16,7 @@ public class GraphUtilities
     private List<NodeType> graphViewNodes ;
     private List<Edge> graphViewEdges;
     private NodeDataContainer container;
-    public static GraphUtilities GetInstance(GraphViewScreen targetView)
+    /*public  GraphUtilities GetInstance(GraphViewScreen targetView)
     {
         return new GraphUtilities
         {
@@ -24,6 +24,13 @@ public class GraphUtilities
             graphViewNodes = targetView.nodes.ToList().Cast<NodeType>().ToList(),
             graphViewEdges = targetView.edges.ToList()
         };
+    }*/
+
+    public GraphUtilities(GraphViewScreen targetView)
+    {
+        graphView = targetView;
+        graphViewNodes = targetView.nodes.ToList().Cast<NodeType>().ToList();
+        graphViewEdges = targetView.edges.ToList();
     }
 
 
