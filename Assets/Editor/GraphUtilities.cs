@@ -4,16 +4,12 @@ using UnityEngine;
 using System.Linq;
 using UnityEditor;
 using UnityEngine.UIElements;
-using System;
-
-
-
 public class GraphUtilities
 {
     public enum GraphFileActionType
     {
-        Export,
-        Import
+        Save,
+        Load
     }
     
     private GraphViewScreen graphView;
@@ -31,7 +27,7 @@ public class GraphUtilities
     }
 
 
-    public void ExportGraph(string fileName)
+    public void SaveGraphView(string fileName)
     {
         NodeDataContainer nodeDataContainer = ScriptableObject.CreateInstance<NodeDataContainer>();
 
@@ -57,11 +53,13 @@ public class GraphUtilities
         {
             AssetDatabase.CreateFolder("Assets", "Resources");
         }
+
+        EditorUtility.SetDirty(nodeDataContainer);
         AssetDatabase.CreateAsset(nodeDataContainer, $"Assets/Resources/{fileName}.asset");
         AssetDatabase.SaveAssets();
     }
 
-    public void ImportGraph(string fileName)
+    public void LoadGraphView(string fileName)
     {
         container = Resources.Load<NodeDataContainer>(fileName);
         if (container == null)
@@ -80,71 +78,36 @@ public class GraphUtilities
         graphView.RemoveAllNodesFromGraphView();
     }
 
+    // Create NodeType for each NodeData in container
     private void CreateNodes()
     {
         container.NodesData.ForEach((node) =>
         {
             NodeType loadedNode = graphView.CreateNodeType(node.type);
             loadedNode.GUID = node.NodeGUID;
-            loadedNode.SetPosition(new Rect(node.Position.x, node.Position.y, 150, 150));
+            loadedNode.SetPosition(new Rect(node.Position.x, node.Position.y, graphView.NodeSize.x, graphView.NodeSize.y));
             graphView.AddNodeToScreen(loadedNode);
-
-
-            Debug.Log(loadedNode.inputContainer[0]);
         });
     }
 
+    // Create conenction betwenn node for each NodeDataConnection in container
     private void CreateEdges()
     {
-        /*
-        for (int i = 0; i < graphViewNodes.Count; i++)
-        {
-            List<NodeConnectionData> connections = container.NodesConnectionsData.Where(n => n.BaseNodeGUID == graphViewNodes[i].GUID).ToList();
-
-            for (int j = 0; j < connections.Count; j++)
-            {
-                string baseNodeGUID = connections[j].BaseNodeGUID;
-                string targetNodeGUID = connections[j].TargetNodeGUID;
-                NodeType targetNode = graphViewNodes.First(n => n.GUID == targetNodeGUID);
-                //Debug.Log("Input " + graphViewNodes[i].inputContainer[j].Q<Port>());
-                //Debug.Log("OutPut " + graphViewNodes[i].outputContainer[j].Q<Port>());
-                
-                //LinkNodes(graphViewNodes[i].inputContainer[j].Q<Port>(), graphViewNodes[i].outputContainer[j].Q<Port>());
-            }
-        }*/
         List<NodeType> allNodes = graphView.GetGraphViewNodeList();
-        for (int i = 0; i < container.NodesConnectionsData.Count; i++)
+        container.NodesConnectionsData.ForEach(nodeConnection =>
         {
-            NodeType baseNode = allNodes.Find(n => n.GUID == container.NodesConnectionsData[i].BaseNodeGUID);
-            NodeType targetNode = allNodes.Find(n => n.GUID == container.NodesConnectionsData[i].TargetNodeGUID);
-            //Debug.Log(baseNode.outputContainer.Q<Port>());
-            //Debug.Log(targetNode.inputContainer.Q<Port>());
-            //LinkNodes(baseNode.outputContainer.Q<Port>(), targetNode.inputContainer.Q<Port>());
-        }
-        /*List<NodeType> allNodes = graphView.GetGraphViewNodeList();
-        for (int i = 0; i < allNodes.Count; i++)
-        {
-            List<NodeConnectionData> connections = container.NodesConnectionsData.Where(n => n.BaseNodeGUID == allNodes[i].GUID).ToList();
-
-            for (int j = 0; j < connections.Count; j++)
-            {
-                string targetNodeGUID = connections[j].TargetNodeGUID;
-                NodeType targetNode = allNodes.First(n => n.GUID == targetNodeGUID);
-                LinkNodes(allNodes[i].outputContainer[j].Q<Port>(), (Port)targetNode.inputContainer[0]);
-            }
-        }*/
-        
+            NodeType baseNode = allNodes.Find(n => n.GUID == nodeConnection.BaseNodeGUID);
+            NodeType targetNode = allNodes.Find(n => n.GUID == nodeConnection.TargetNodeGUID);
+            LinkNodes(baseNode.outputContainer.Q<Port>(), targetNode.inputContainer.Q<Port>());
+        });
     }
 
     private void LinkNodes(Port output, Port input)
     {
-        Debug.Log(output);
-        Debug.Log(input);
-        
         var edge = new Edge
         {
             output = output,
-            input = output
+            input = input
         };
         edge.input.Connect(edge);
         edge.output.Connect(edge);

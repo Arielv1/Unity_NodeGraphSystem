@@ -7,6 +7,9 @@ using System;
 
 public class GraphViewScreen : GraphView
 {
+    public readonly Vector2 NodeSize = new Vector2(150, 200);
+    private float nodePosOffset = 0;
+    private float nodePosInit = 100;
     private List<NodeType> NodesList = new List<NodeType>();
     public GraphViewScreen()
     {
@@ -18,7 +21,7 @@ public class GraphViewScreen : GraphView
         var bgGrid = new GridBackground();
         Insert(0, bgGrid);
         bgGrid.StretchToParentSize();
-        styleSheets.Add(Resources.Load<StyleSheet>("Graph"));
+        styleSheets.Add(Resources.Load<StyleSheet>("GraphBG"));
     }
 
     public List<NodeType> GetGraphViewNodeList()
@@ -47,13 +50,19 @@ public class GraphViewScreen : GraphView
         
         var inputPort = GeneratePort(nodeType, Direction.Input);
         inputPort.portName = "Input";
-        nodeType.outputContainer.Add(inputPort);
+        nodeType.inputContainer.Add(inputPort);
 
         var outputPort = GeneratePort(nodeType, Direction.Output);
         outputPort.portName = "Output";
         nodeType.outputContainer.Add(outputPort);
 
-        nodeType.SetPosition(new Rect(200, 200, 150, 150));
+        nodeType.SetPosition(new Rect(nodePosInit + nodePosOffset, nodePosInit + nodePosOffset, NodeSize.x, NodeSize.y));
+
+        nodePosOffset = nodePosOffset < 100 ? nodePosOffset + 10 : 0;
+
+        Debug.Log("Node" + type.ToString() + "BG");
+        nodeType.styleSheets.Add(Resources.Load<StyleSheet>("Node" + type.ToString() + "BG"));
+
         nodeType.RefreshExpandedState();
         nodeType.RefreshPorts();
 
