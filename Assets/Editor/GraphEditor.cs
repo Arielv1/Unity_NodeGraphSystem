@@ -20,7 +20,6 @@ public class GraphEditor : EditorWindow
     {
         BuildGraph();
         BuildToolbar();
-        BuildMinimap();
     }
 
     private void OnDisable()
@@ -71,15 +70,7 @@ public class GraphEditor : EditorWindow
         graphView.Add(toolbar);
     }
 
-    void BuildMinimap()
-    {
-        MiniMap minimap = new MiniMap();
-        minimap.anchored = true;
-        minimap.SetPosition(new Rect(550, 50, 200, 200));
-        graphView.Add(minimap);
-    }
-
-    // Performs action based on file - for now save & load file, if more actions are added in future need to add their 'case' in switch statement.
+    // Performs action based on file - for now save & load file, if more actions are added in future need to add their case in switch statement.
     void PerformGraphViewOnFileAction(GraphUtilities.GraphFileActionType actionType)
     {
         if (fileName == null || fileName.Length == 0)
