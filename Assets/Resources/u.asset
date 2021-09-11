@@ -1,0 +1,37 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 34c60205fc6173e479731d4393899aff, type: 3}
+  m_Name: u
+  m_EditorClassIdentifier: 
+  NodesData:
+  - NodeGUID: 9f027642-9b1e-4522-9a63-0bac703ba593
+    type: 0
+    Position: {x: 200, y: 200}
+  - NodeGUID: f281ed1b-5f13-44bf-83e1-dd0b6444a302
+    type: 0
+    Position: {x: 33, y: 200}
+  - NodeGUID: a58d82a1-9298-4545-b18f-35e185178132
+    type: 1
+    Position: {x: 103, y: 340}
+  - NodeGUID: 0b208579-4cde-464e-9fc3-a935c7e02bad
+    type: 1
+    Position: {x: 242, y: 340}
+  - NodeGUID: 355402b6-7aaa-448d-a4e7-ac0096c62a24
+    type: 2
+    Position: {x: 172, y: 453}
+  NodesConnectionsData:
+  - BaseNodeGUID: f281ed1b-5f13-44bf-83e1-dd0b6444a302
+    TargetNodeGUID: 9f027642-9b1e-4522-9a63-0bac703ba593
+    OutputPortName: Output
+  - BaseNodeGUID: a58d82a1-9298-4545-b18f-35e185178132
+    TargetNodeGUID: 0b208579-4cde-464e-9fc3-a935c7e02bad
+    OutputPortName: Output
